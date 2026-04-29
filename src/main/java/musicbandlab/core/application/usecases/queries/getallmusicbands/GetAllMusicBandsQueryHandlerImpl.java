@@ -4,6 +4,7 @@ import musicbandlab.core.domain.MusicBand;
 import musicbandlab.core.ports.MusicBandRepository;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Реализация обработчика запроса на получение всех музыкальных групп.
@@ -16,7 +17,7 @@ public class GetAllMusicBandsQueryHandlerImpl implements GetAllMusicBandsQueryHa
     }
 
     @Override
-    public ArrayList<MusicBand> handle() {
+    public ArrayList<Map.Entry<String, MusicBand>> handle() {
         return musicBandRepository.getAll();
     }
 }

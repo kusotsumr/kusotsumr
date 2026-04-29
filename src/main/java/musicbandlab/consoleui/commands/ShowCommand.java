@@ -7,6 +7,7 @@ import musicbandlab.core.domain.MusicBand;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -25,16 +26,19 @@ public class ShowCommand extends AbstractConsoleCommand {
     @Override
     public void execute() {
         GetAllMusicBandsQueryHandler handler = serviceLocator.getGetAllMusicBandsQueryHandler();
-        ArrayList<MusicBand> musicBands = handler.handle();
+        ArrayList<Map.Entry<String, MusicBand>> entries = handler.handle();
 
-        if(musicBands.isEmpty()) {
+        if(entries.isEmpty()) {
             System.out.println("Коллекция пуста");
             return;
         }
 
         System.out.println("Элементы коллекции:");
-        for(MusicBand musicBand : musicBands) {
-            System.out.println(musicBand);
+        for(Map.Entry<String, MusicBand> entry : entries) {
+            System.out.println("Ключ: " + entry.getKey());
+            System.out.println(entry.getValue());
+            System.out.println();
+            System.out.println();
         }
     }
 }

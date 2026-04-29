@@ -5,13 +5,14 @@ import musicbandlab.core.domain.MusicBand;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Интерфейс репозитория для работы с коллекцией музыкальных групп.
  * Определяет все доступные операции для получения, добавления, обновления, удаления элементов и получения различной информации о коллекции.
  */
 public interface MusicBandRepository {
-    public ArrayList<MusicBand> getAll();
+    public ArrayList<Map.Entry<String, MusicBand>> getAll();
     public MusicBand get(String key);
     public void insert(String key, MusicBand musicBand);
     public void updateWhereIdIsEqualTo(int id, MusicBand musicBand);

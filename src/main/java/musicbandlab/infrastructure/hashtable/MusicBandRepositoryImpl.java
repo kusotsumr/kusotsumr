@@ -19,8 +19,8 @@ public final class MusicBandRepositoryImpl implements MusicBandRepository {
     private static int nextId = 1;
 
     @Override
-    public ArrayList<MusicBand> getAll() {
-        return new ArrayList<>(hashTable.values());
+    public ArrayList<Map.Entry<String, MusicBand>> getAll() {
+        return new ArrayList<>(hashTable.entrySet());
     }
 
     @Override
