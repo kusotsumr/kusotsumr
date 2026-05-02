@@ -30,6 +30,11 @@ public final class MusicBandRepositoryImpl implements MusicBandRepository {
     }
 
     @Override
+    public int getHashCode() {
+        return hashTable.hashCode();
+    }
+
+    @Override
     public void insert(String key, MusicBand musicBand) {
         throwIfKeyIsNullOrEmpty(key);
         Objects.requireNonNull(musicBand, "musicBand");

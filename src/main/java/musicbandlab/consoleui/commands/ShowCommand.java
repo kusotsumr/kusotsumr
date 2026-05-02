@@ -3,6 +3,7 @@ package musicbandlab.consoleui.commands;
 import musicbandlab.consoleui.ServiceLocator;
 import musicbandlab.consoleui.annotations.CommandAnnotation;
 import musicbandlab.core.application.usecases.queries.getallmusicbands.GetAllMusicBandsQueryHandler;
+import musicbandlab.core.application.usecases.queries.gethashcode.GetHashCodeQueryHandler;
 import musicbandlab.core.domain.MusicBand;
 
 import java.io.PrintStream;
@@ -25,8 +26,10 @@ public class ShowCommand extends AbstractConsoleCommand {
 
     @Override
     public void execute() {
-        GetAllMusicBandsQueryHandler handler = serviceLocator.getGetAllMusicBandsQueryHandler();
-        ArrayList<Map.Entry<String, MusicBand>> entries = handler.handle();
+        GetAllMusicBandsQueryHandler allMusicBandsQueryHandler = serviceLocator.getGetAllMusicBandsQueryHandler();
+        GetHashCodeQueryHandler hashCodeQueryHandler = serviceLocator.getGetHashCodeQueryHandler();
+        ArrayList<Map.Entry<String, MusicBand>> entries = allMusicBandsQueryHandler.handle();
+        int hashCode = hashCodeQueryHandler.handle();
 
         if(entries.isEmpty()) {
             System.out.println("Коллекция пуста");
@@ -40,5 +43,6 @@ public class ShowCommand extends AbstractConsoleCommand {
             System.out.println();
             System.out.println();
         }
+        System.out.println("Хешкод хештейбла:\t" + hashCode);
     }
 }

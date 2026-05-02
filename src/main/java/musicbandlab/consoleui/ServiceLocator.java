@@ -18,6 +18,8 @@ import musicbandlab.core.application.usecases.queries.getallmusicbands.GetAllMus
 import musicbandlab.core.application.usecases.queries.getallmusicbands.GetAllMusicBandsQueryHandlerImpl;
 import musicbandlab.core.application.usecases.queries.getcountbynumberofparticipants.GetCountByNumberOfParticipantsQueryHandler;
 import musicbandlab.core.application.usecases.queries.getcountbynumberofparticipants.GetCountByNumberOfParticipantsQueryHandlerImpl;
+import musicbandlab.core.application.usecases.queries.gethashcode.GetHashCodeQueryHandler;
+import musicbandlab.core.application.usecases.queries.gethashcode.GetHashCodeQueryHandlerImpl;
 import musicbandlab.core.application.usecases.queries.getmusicbandsinfo.GetMusicBandsInfoQueryHandler;
 import musicbandlab.core.application.usecases.queries.getmusicbandsinfo.GetMusicBandsInfoQueryHandlerImpl;
 import musicbandlab.core.application.usecases.queries.getmusicbandslabelsdescending.GetMusicBandsLabelsDescendingQueryHandler;
@@ -44,6 +46,7 @@ public class ServiceLocator {
     private final RemoveWhereLessMusicBandsCommandHandler removeWhereLessMusicBandsCommandHandler;
     private final UpdateMusicBandCommandHandler updateMusicBandCommandHandler;
     private final GetAllMusicBandsQueryHandler getAllMusicBandsQueryHandler;
+    private final GetHashCodeQueryHandler getHashCodeQueryHandler;
     private final GetCountByNumberOfParticipantsQueryHandler getCountByNumberOfParticipantsQueryHandler;
     private final GetMusicBandsInfoQueryHandler getMusicBandsInfoQueryHandler;
     private final GetMusicBandsLabelsDescendingQueryHandler getMusicBandsLabelsDescendingQueryHandler;
@@ -73,6 +76,7 @@ public class ServiceLocator {
         removeWhereLessMusicBandsCommandHandler = new RemoveWhereLessMusicBandsCommandHandlerImpl(repository);
         updateMusicBandCommandHandler = new UpdateMusicBandCommandHandlerImpl(repository);
         getAllMusicBandsQueryHandler = new GetAllMusicBandsQueryHandlerImpl(repository);
+        getHashCodeQueryHandler = new GetHashCodeQueryHandlerImpl(repository);
         getCountByNumberOfParticipantsQueryHandler = new GetCountByNumberOfParticipantsQueryHandlerImpl(repository);
         getMusicBandsInfoQueryHandler = new GetMusicBandsInfoQueryHandlerImpl(repository);
         getMusicBandsLabelsDescendingQueryHandler = new GetMusicBandsLabelsDescendingQueryHandlerImpl(repository);
@@ -110,6 +114,10 @@ public class ServiceLocator {
 
     public GetAllMusicBandsQueryHandler getGetAllMusicBandsQueryHandler() {
         return getAllMusicBandsQueryHandler;
+    }
+
+    public GetHashCodeQueryHandler getGetHashCodeQueryHandler() {
+        return getHashCodeQueryHandler;
     }
 
     public GetCountByNumberOfParticipantsQueryHandler getGetCountByNumberOfParticipantsQueryHandler() {
