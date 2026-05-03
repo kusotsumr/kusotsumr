@@ -117,6 +117,26 @@ public final class MusicBandRepositoryImpl implements MusicBandRepository {
         }
         return false;
     }
+    @Override
+    public long getSumNumberOfParticipants() {
+        Collection<MusicBand> musicBands = hashTable.values();
+        int count = 0;
+        long result;
+        ArrayList<Long> numberOfParticipants = new ArrayList<>();
+        for (MusicBand per : musicBands) {
+            count += 1;
+            numberOfParticipants.add(per.getNumberOfParticipants());
+        }
+        numberOfParticipants.sort(Comparator.naturalOrder());
+        if (count % 2 == 1) {
+            result = numberOfParticipants.get(count / 2);
+        } else if (count == 0) {
+            result = 0;
+        }else {
+            result = (numberOfParticipants.get(count / 2) + numberOfParticipants.get(count / 2 - 1)) /2 ;
+        }
+        return result;
+    }
 
     @Override
     public int getCountWhereNumberOfParticipantsEqualsTo(long numberOfParticipants) {

@@ -14,6 +14,7 @@ import java.util.Map;
 public interface MusicBandRepository {
     public ArrayList<Map.Entry<String, MusicBand>> getAll();
     public int getHashCode();
+    public long getSumNumberOfParticipants();
     public MusicBand get(String key);
     public void insert(String key, MusicBand musicBand);
     public void updateWhereIdIsEqualTo(int id, MusicBand musicBand);
