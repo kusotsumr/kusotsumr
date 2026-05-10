@@ -19,12 +19,12 @@ import java.util.Scanner;
 )
 public class RemoveLowerCommand extends AbstractConsoleCommand{
     public RemoveLowerCommand(ServiceLocator serviceLocator, Scanner scanner, PrintStream systemMessagesStream, String[] parts) {
-        super(serviceLocator, scanner, systemMessagesStream, parts, 5);
+        super(serviceLocator, scanner, systemMessagesStream, parts, 1);
     }
 
     @Override
     public void execute() throws Exception {
-        MusicBand musicBand = Parse(1);
+        MusicBand musicBand = Parse();
         RemoveWhereLessMusicBandsCommandHandler handler = serviceLocator.getRemoveWhereLessMusicBandsCommandHandler();
         handler.handle(new RemoveWhereLessMusicBandsCommand(musicBand));
     }

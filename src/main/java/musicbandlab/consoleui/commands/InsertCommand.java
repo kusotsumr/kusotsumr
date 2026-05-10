@@ -19,14 +19,14 @@ import java.util.Scanner;
 )
 public class InsertCommand extends AbstractConsoleCommand{
     public InsertCommand(ServiceLocator serviceLocator, Scanner scanner, PrintStream systemMessagesStream, String[] parts) {
-        super(serviceLocator, scanner, systemMessagesStream, parts, 6);
+        super(serviceLocator, scanner, systemMessagesStream, parts, 2);
     }
 
     @Override
-    public void execute() { // public Response execute(Request req)
+    public void execute() {
         InsertMusicBandCommandHandler handler = serviceLocator.getInsertMusicBandCommandHandler();
         String key = parts[1];
-        MusicBand musicBand = Parse(2);
+        MusicBand musicBand = Parse();
 
         handler.handle(new InsertMusicBandCommand(key, musicBand));
     }
