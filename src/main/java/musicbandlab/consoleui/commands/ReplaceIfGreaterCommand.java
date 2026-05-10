@@ -19,13 +19,13 @@ import java.util.Scanner;
 )
 public class ReplaceIfGreaterCommand extends AbstractConsoleCommand {
     public ReplaceIfGreaterCommand(ServiceLocator serviceLocator, Scanner scanner, PrintStream systemMessagesStream, String[] parts) {
-        super(serviceLocator, scanner, systemMessagesStream, parts, 6);
+        super(serviceLocator, scanner, systemMessagesStream, parts, 2);
     }
 
     @Override
     public void execute() throws Exception {
         String key = parts[1];
-        MusicBand musicBand = Parse(2);
+        MusicBand musicBand = Parse();
 
         ReplaceIfGreaterThanMusicBandCommandHandler handler = serviceLocator.getReplaceIfGreaterThanMusicBandCommandHandler();
         handler.handle(new ReplaceIfGreaterThanMusicBandCommand(key, musicBand));
