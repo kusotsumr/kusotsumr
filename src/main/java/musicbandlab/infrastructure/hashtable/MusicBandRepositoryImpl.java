@@ -216,16 +216,28 @@ public final class MusicBandRepositoryImpl implements MusicBandRepository {
             if (data.containsKey("bands")) {
                 Map<String, Object> bandsMap = (Map<String, Object>) data.get("bands");
 
+                int errors = 0;
                 for (Map.Entry<String, Object> entry : bandsMap.entrySet()) {
-                    String key = entry.getKey();
-                    MusicBand band = mapper.convertValue(entry.getValue(), MusicBand.class);
-                    repo.hashTable.put(key, band);
+                    try {
+                        String key = entry.getKey();
+                        MusicBand band = mapper.convertValue(entry.getValue(), MusicBand.class);
+                        repo.hashTable.put(key, band);
+                    }
+                    catch (Exception e) {
+                        errors++;
+                    }
+                }
+
+                if (errors > 0) {
+                    System.out.println("Сохраненная коллекция прочитана с ошибками. Пропущено музыкальных групп: " + errors);
                 }
             }
 
             return repo;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to deserialize from json", e);
+            System.out.println("Ошибка при чтении сохраненной коллекции.");
+            System.exit(1);
+            throw new UnsupportedOperationException("Эта строчка никогда не вызовется из-за system.exit");
         }
     }
 
