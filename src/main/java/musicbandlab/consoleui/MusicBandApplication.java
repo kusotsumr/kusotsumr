@@ -25,10 +25,14 @@ public class MusicBandApplication {
     public void run() {
         System.out.println("При вводе внутри строки null вводится как 'null'");
         System.out.println("При вводе с новой строки null вводится в виде пустой строки");
-        System.out.println("{element} имеет вид \"id/null name number_of_participants albums_count\"");
+        System.out.println("Каждое значение из {element} вводится с новой строки");
         System.out.println("id = null нужен для поисковых запросов. При insert он генерируется автоматически");
         System.out.println("Пример:");
-        System.out.println("insert my_key null my_name 5 6");
+        System.out.println("insert my_key");
+        System.out.println("null");
+        System.out.println("my_name");
+        System.out.println("5");
+        System.out.println("6");
         System.out.println("40");
         System.out.println("45");
         System.out.println("blues");

@@ -51,6 +51,7 @@ public class ServiceLocator {
     private final MusicBandRepository musicBandRepository;
     private final String fileName;
     private final MusicBandApplication musicBandApplication;
+    private final ExecuteScriptHelper executeScriptHelper;
 
     public ServiceLocator(String fileName, MusicBandApplication musicBandApplication) {
         this.musicBandApplication = musicBandApplication;
@@ -65,6 +66,7 @@ public class ServiceLocator {
         }
         this.fileName = fileName;
 
+        executeScriptHelper = new ExecuteScriptHelper();
         clearMusicBandsCommandHandler = new ClearMusicBandsCommandHandlerImpl(repository);
         insertMusicBandCommandHandler = new InsertMusicBandCommandHandlerImpl(repository);
         replaceIfGreaterThanMusicBandCommandHandler = new ReplaceIfGreaterThanMusicBandCommandHandlerImpl(repository);
@@ -78,6 +80,10 @@ public class ServiceLocator {
         getMusicBandsLabelsDescendingQueryHandler = new GetMusicBandsLabelsDescendingQueryHandlerImpl(repository);
         getMusicBandsWhereLabelLessThanQueryHandler = new GetMusicBandsWhereLabelLessThanQueryHandlerImpl(repository);
         musicBandRepository = repository;
+    }
+
+    public ExecuteScriptHelper getExecuteScriptHelper() {
+        return executeScriptHelper;
     }
 
     public ClearMusicBandsCommandHandler getClearMusicBandsCommandHandler() {

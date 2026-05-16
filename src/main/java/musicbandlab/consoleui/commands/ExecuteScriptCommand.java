@@ -1,10 +1,12 @@
 package musicbandlab.consoleui.commands;
 
+import musicbandlab.consoleui.ExecuteScriptHelper;
 import musicbandlab.consoleui.MusicBandApplication;
 import musicbandlab.consoleui.ServiceLocator;
 import musicbandlab.consoleui.annotations.CommandAnnotation;
 
 import java.io.PrintStream;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 /**
@@ -24,8 +26,23 @@ public class ExecuteScriptCommand extends AbstractConsoleCommand{
 
     @Override
     public void execute() throws Exception {
-        String fileName = parts[1];
+        // Конвертируем в абсолютный путь, чтобы моментально приостановить
+        // скрытую рекурсию, т.е. когда одинаковый файл
+        // вызывается под разными именами (относительный / абсолютный)
+        String fileName = Paths.get(parts[1]).toAbsolutePath().toString();
+
         MusicBandApplication musicBandApplication = serviceLocator.getMusicBandApplication();
-        musicBandApplication.run(fileName);
+        ExecuteScriptHelper executeScriptHelper = serviceLocator.getExecuteScriptHelper();
+
+        if(!executeScriptHelper.TryEnter(fileName)) {
+            System.out.println("Файл " + fileName + " не может быть вызван рекурсивно, скрипт не будет исполнен.");
+            return;
+        }
+
+        try {
+            musicBandApplication.run(fileName);
+        } finally {
+            executeScriptHelper.Exit(fileName);
+        }
     }
 }
