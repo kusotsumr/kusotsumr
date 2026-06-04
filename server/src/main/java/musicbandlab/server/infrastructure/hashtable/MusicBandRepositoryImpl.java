@@ -1,8 +1,7 @@
 package musicbandlab.server.infrastructure.hashtable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import musicbandlab.common.contracts.DataEntry;
 import musicbandlab.common.domain.Label;
 import musicbandlab.common.domain.MusicBand;
 import musicbandlab.server.core.ports.MusicBandRepository;
@@ -25,12 +24,13 @@ public final class MusicBandRepositoryImpl implements MusicBandRepository {
     }
 
     @Override
-    public ArrayList<Map.Entry<String, MusicBand>> getAll(int page, int pageSize) {
+    public ArrayList<DataEntry<String, MusicBand>> getAll(int page, int pageSize) {
         return hashTable.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue())
                 .skip((long) (page - 1) * pageSize)
                 .limit(pageSize)
+                .map(entry -> new DataEntry<>(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 

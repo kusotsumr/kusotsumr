@@ -3,9 +3,6 @@ package musicbandlab.server.api.adapters.udp;
 import musicbandlab.common.contracts.Request;
 import musicbandlab.server.api.HandlerRegistry;
 
-import java.net.InetSocketAddress;
-import java.nio.channels.DatagramChannel;
-
 public class RequestInvoker {
     private final HandlerRegistry registry;
 
@@ -13,15 +10,15 @@ public class RequestInvoker {
         this.registry = registry;
     }
 
-    public Object handle(Class<?> requestType, Object requestObj) {
+    public Object handle(Object request) {
         musicbandlab.server.core.application.usecases.RequestHandler<?, ?> handler =
-                registry.get(requestType);
+                registry.get(request.getClass());
 
         if (handler == null) {
             throw new RuntimeException("No handler");
         }
 
-        Object result = invoke(handler, requestObj);
+        Object result = invoke(handler, request);
         return result;
     }
 

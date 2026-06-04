@@ -2,13 +2,13 @@ package musicbandlab.client.consoleui.commands;
 
 import musicbandlab.client.consoleui.ServiceLocator;
 import musicbandlab.client.consoleui.annotations.CommandAnnotation;
+import musicbandlab.common.contracts.DataEntry;
 import musicbandlab.common.contracts.queries.getallmusicbands.GetAllMusicBandsQuery;
 import musicbandlab.common.contracts.queries.getallmusicbands.GetAllMusicBandsQueryResponse;
 import musicbandlab.common.domain.MusicBand;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -32,7 +32,7 @@ public class ShowCommand extends AbstractConsoleCommand {
             GetAllMusicBandsQueryResponse response = gateway.get(
                     new GetAllMusicBandsQuery(page, 2));
 
-            ArrayList<Map.Entry<String, MusicBand>> musicBands = response.getMusicBands();
+            ArrayList<DataEntry<String, MusicBand>> musicBands = response.getMusicBands();
 
             if (musicBands.isEmpty()) {
                 if (page == 1) {
@@ -44,9 +44,9 @@ public class ShowCommand extends AbstractConsoleCommand {
             if (page == 1) {
                 System.out.println("Элементы коллекции:");
             }
-            for(Map.Entry<String, MusicBand> musicBand : musicBands) {
-                System.out.println("Ключ: " + musicBand.getKey());
-                System.out.println(musicBand.getValue());
+            for(DataEntry<String, MusicBand> musicBand : musicBands) {
+                System.out.println("Ключ: " + musicBand.key());
+                System.out.println(musicBand.value());
                 System.out.println();
                 System.out.println();
             }

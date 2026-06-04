@@ -2,39 +2,34 @@ package musicbandlab.client.consoleui;
 
 import musicbandlab.common.contracts.Request;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import musicbandlab.common.contracts.packets.PacketRequest;
-import musicbandlab.common.contracts.packets.PacketResponse;
-
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.nio.charset.StandardCharsets;
 
 public class ServerGateway {
     private static final int MAX_RETRIES = 5;
     public static final int TIMEOUT_MILLISECONDS = 1000;
 
     private final Config config;
-    private final ObjectMapper mapper;
     private DatagramChannel channel;
 
-    public ServerGateway(Config config, ObjectMapper mapper) {
+    public ServerGateway(Config config) {
         this.config = config;
-        this.mapper = mapper;
     }
 
-    public <TRequest extends Request<TResponse>, TResponse>
+    public <TRequest extends Request<TResponse>, TResponse extends Serializable>
     TResponse get(TRequest request) throws Exception {
 
         InetSocketAddress server =
                 new InetSocketAddress(config.getHost(), config.getPort());
 
-        PacketRequest packetRequest = new PacketRequest(
-                request.getClass().getName(),
-                mapper.writeValueAsString(request)
-        );
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos)) {
+            oos.writeObject(request);
+        }
+        byte[] requestBytes = baos.toByteArray();
 
         Exception lastException = null;
 
@@ -45,7 +40,7 @@ public class ServerGateway {
 
             try {
                 channel.send(
-                        ByteBuffer.wrap(mapper.writeValueAsBytes(packetRequest)),
+                        ByteBuffer.wrap(requestBytes),
                         server
                 );
 
@@ -67,29 +62,17 @@ public class ServerGateway {
                     byte[] data = new byte[buffer.remaining()];
                     buffer.get(data);
 
-                    PacketResponse response =
-                            mapper.readValue(new String(data, StandardCharsets.UTF_8),
-                                    PacketResponse.class);
-
-                    if (!response.success()) {
-                        throw new RuntimeException(response.error());
+                    Object responseObj;
+                    try (java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(data);
+                         java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais)) {
+                        responseObj = ois.readObject();
                     }
 
-                    if (response.payload() == null) {
-                        return null;
+                    if (responseObj instanceof Exception serverException) {
+                        throw serverException;
                     }
 
-                    try {
-                        Class<?> type = Class.forName(response.responseType());
-
-                        return (TResponse) mapper.readValue(
-                                response.payload(),
-                                type
-                        );
-
-                    } catch (ClassNotFoundException e) {
-                        throw new RuntimeException("Invalid response type", e);
-                    }
+                    return (TResponse) responseObj;
                 }
 
                 throw new UdpNetworkException("Timeout waiting for UDP response");

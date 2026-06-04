@@ -6,7 +6,7 @@ import java.util.Objects;
  * Класс, представляющий лейбл музыкальной группы.
  * Хранит количество групп на лейбле и позволяет сравнивать лейблы по этому значению.
  */
-public class Label implements Comparable<Label> {
+public class Label implements Comparable<Label>, java.io.Serializable {
     private Integer bands;
 
     private Label() {

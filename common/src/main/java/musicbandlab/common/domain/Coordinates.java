@@ -5,7 +5,7 @@ package musicbandlab.common.domain;
  * Содержит координаты "x" и "y" с ограничениями по значениям.
  * Реализует Comparable для сравнения координат.
  */
-public class Coordinates implements Comparable<Coordinates> {
+public class Coordinates implements Comparable<Coordinates>, java.io.Serializable {
     private int x;
     private double y;
 

@@ -1,24 +1,24 @@
 package musicbandlab.common.contracts.queries.getmusicbandsinfo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Ответ на запрос информации о коллекции.
  * Содержит тип коллекции, дату инициализации и количество элементов.
  */
-public final class GetMusicBandsInfoQueryResponse {
+public final class GetMusicBandsInfoQueryResponse implements java.io.Serializable {
+    private static final DateTimeFormatter SYSTEM_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss 'МСК'");
     private final String type;
     private final ZonedDateTime initializationDate;
     private final int size;
 
-    @JsonCreator
     public GetMusicBandsInfoQueryResponse(
-            @JsonProperty("type")String type,
-            @JsonProperty("initializationDate")ZonedDateTime initializationDate,
-            @JsonProperty("size")int size) {
+            String type,
+            ZonedDateTime initializationDate,
+            int size) {
         this.type = type;
         this.initializationDate = initializationDate;
         this.size = size;
@@ -38,9 +38,13 @@ public final class GetMusicBandsInfoQueryResponse {
 
     @Override
     public String toString() {
+        String date = initializationDate == null
+                ? "не инициализирована"
+                : initializationDate.withZoneSameInstant(ZoneId.of("Europe/Moscow")).format(SYSTEM_DATE_FORMATTER);
+
         return "Информация о коллекции:{\n" +
                 "    type                = '" + type + "'\n" +
-                "    initializationDate  = " + initializationDate + "\n" +
+                "    initializationDate  = " + date + "\n" +
                 "    size                = " + size + "\n" +
                 "}";
     }

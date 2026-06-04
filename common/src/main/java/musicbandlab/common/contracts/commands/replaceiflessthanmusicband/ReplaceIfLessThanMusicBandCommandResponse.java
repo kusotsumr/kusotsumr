@@ -1,13 +1,9 @@
 package musicbandlab.common.contracts.commands.replaceiflessthanmusicband;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class ReplaceIfLessThanMusicBandCommandResponse {
+public class ReplaceIfLessThanMusicBandCommandResponse implements java.io.Serializable {
     private final boolean success;
 
-    @JsonCreator
-    public ReplaceIfLessThanMusicBandCommandResponse(@JsonProperty("success")boolean success) {
+    public ReplaceIfLessThanMusicBandCommandResponse(boolean success) {
         this.success = success;
     }
 

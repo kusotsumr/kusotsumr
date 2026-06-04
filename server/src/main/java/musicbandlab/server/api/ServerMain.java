@@ -45,9 +45,9 @@ public class ServerMain {
         ));
 
         BlockingQueue<ControlCommand> commands = new LinkedBlockingQueue<>();
-        RequestSender requestSender = new RequestSender(mapper);
+        RequestSender requestSender = new RequestSender();
         RequestInvoker requestHandler = new RequestInvoker(registry);
-        RequestReader requestReader = new RequestReader(mapper, requestHandler, requestSender);
+        RequestReader requestReader = new RequestReader(requestHandler, requestSender);
         UdpServer server = new UdpServer(commands, config, repository, requestReader);
 
         Thread serverThread = new Thread(server::run);

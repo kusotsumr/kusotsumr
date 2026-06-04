@@ -48,7 +48,7 @@ public class CommandExecutor {
                         instance = (AbstractConsoleCommand) clazz.getDeclaredConstructor(ServiceLocator.class, Scanner.class, PrintStream.class, String[].class)
                                 .newInstance(serviceLocator, scanner, systemMessagesStream, parts);
 
-                        instance.execute();
+                        instance.executeCommand();
 
                         scan.close();
                         return;
