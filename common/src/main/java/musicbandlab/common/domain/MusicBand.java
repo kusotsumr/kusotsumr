@@ -1,6 +1,8 @@
 package musicbandlab.common.domain;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
@@ -8,7 +10,10 @@ import java.util.Objects;
  * Содержит информацию о названии, координатах, дате создания, количестве участников, количестве альбомов, жанре и лейбле.
  * Реализует Comparable для сравнения по координатам.
  */
-public class MusicBand implements Comparable<MusicBand> {
+public class MusicBand implements Comparable<MusicBand>, java.io.Serializable {
+    private static final DateTimeFormatter SYSTEM_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss 'МСК'");
+
     private Integer id;
     private String name; // Поле не может быть null; Строка не может быть пустой
     private Coordinates coordinates; // Поле не может быть null
@@ -135,7 +140,7 @@ public class MusicBand implements Comparable<MusicBand> {
                 "    Идентификатор     = " + id + "\n" +
                 "    название          = '" + name + "'\n" +
                 "    координаты        = " + coordinates + "\n" +
-                "    дата создания     = " + creationDate + "\n" +
+                "    дата создания     = " + creationDate.withZoneSameInstant(ZoneId.of("Europe/Moscow")).format(SYSTEM_DATE_FORMATTER) + "\n" +
                 "    кол-во участников = " + numberOfParticipants + "\n" +
                 "    кол-во альбомов   = " + albumsCount + "\n" +
                 "    жанр              = " + (genre != null ? genre : "отсутствует") + "\n" +

@@ -1,7 +1,5 @@
 package musicbandlab.common.contracts.queries.getmusicbandswherelabellessthan;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import musicbandlab.common.contracts.Request;
 import musicbandlab.common.domain.Label;
 
@@ -16,10 +14,9 @@ public class GetMusicBandsWhereLabelLessThanQuery implements Request<GetMusicBan
     private final int page;
     private final int pageSize;
 
-    @JsonCreator
-    public GetMusicBandsWhereLabelLessThanQuery(@JsonProperty("label")Label label,
-                                                @JsonProperty("page")int page,
-                                                @JsonProperty("pageSize")int pageSize) {
+    public GetMusicBandsWhereLabelLessThanQuery(Label label,
+                                                int page,
+                                                int pageSize) {
         Objects.requireNonNull(label, "label");
 
         if (page < 1) {

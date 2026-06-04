@@ -1,4 +1,6 @@
 package musicbandlab.common.contracts;
 
-public interface Request<TResult> {
+import java.io.Serializable;
+
+public interface Request<TResult extends Serializable> extends Serializable {
 }

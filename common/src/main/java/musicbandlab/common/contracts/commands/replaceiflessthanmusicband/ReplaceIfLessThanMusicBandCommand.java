@@ -1,7 +1,5 @@
 package musicbandlab.common.contracts.commands.replaceiflessthanmusicband;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import musicbandlab.common.contracts.Request;
 import musicbandlab.common.domain.MusicBand;
 
@@ -15,8 +13,7 @@ public class ReplaceIfLessThanMusicBandCommand implements Request<ReplaceIfLessT
     private final String key;
     private final MusicBand musicBand;
 
-    @JsonCreator
-    public ReplaceIfLessThanMusicBandCommand(@JsonProperty("key")String key, @JsonProperty("musicBand")MusicBand musicBand) {
+    public ReplaceIfLessThanMusicBandCommand(String key, MusicBand musicBand) {
         if(key == null || key.isEmpty())
             throw new IllegalArgumentException("key should be not empty");
         Objects.requireNonNull(musicBand, "musicBand");

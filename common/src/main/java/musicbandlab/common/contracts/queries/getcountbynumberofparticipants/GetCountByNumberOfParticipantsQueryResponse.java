@@ -1,13 +1,9 @@
 package musicbandlab.common.contracts.queries.getcountbynumberofparticipants;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class GetCountByNumberOfParticipantsQueryResponse {
+public class GetCountByNumberOfParticipantsQueryResponse implements java.io.Serializable {
     private final int count;
 
-    @JsonCreator
-    public GetCountByNumberOfParticipantsQueryResponse(@JsonProperty("count")int count) {
+    public GetCountByNumberOfParticipantsQueryResponse(int count) {
         this.count = count;
     }
 

@@ -1,18 +1,18 @@
 package musicbandlab.server.core.ports;
 
+import musicbandlab.common.contracts.DataEntry;
 import musicbandlab.common.domain.Label;
 import musicbandlab.common.domain.MusicBand;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Интерфейс репозитория для работы с коллекцией музыкальных групп.
  * Определяет все доступные операции для получения, добавления, обновления, удаления элементов и получения различной информации о коллекции.
  */
 public interface MusicBandRepository {
-    public ArrayList<Map.Entry<String, MusicBand>> getAll(int page, int pageSize);
+    public ArrayList<DataEntry<String, MusicBand>> getAll(int page, int pageSize);
     public MusicBand get(String key);
     public void insert(String key, MusicBand musicBand);
     public void updateWhereIdIsEqualTo(int id, MusicBand musicBand);

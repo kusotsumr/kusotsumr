@@ -1,17 +1,14 @@
 package musicbandlab.common.contracts.queries.getallmusicbands;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import musicbandlab.common.contracts.Request;
 
 public class GetAllMusicBandsQuery implements Request<GetAllMusicBandsQueryResponse> {
     private final int page;
     private final int pageSize;
 
-    @JsonCreator
     public GetAllMusicBandsQuery(
-            @JsonProperty("page")int page,
-            @JsonProperty("pageSize")int pageSize) {
+            int page,
+            int pageSize) {
         if (page < 1) {
             throw new IllegalArgumentException("page must be >= 1");
         }

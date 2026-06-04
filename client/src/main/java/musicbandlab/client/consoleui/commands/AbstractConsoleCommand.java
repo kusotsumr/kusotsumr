@@ -11,6 +11,8 @@ import musicbandlab.common.domain.MusicGenre;
 
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,6 +29,9 @@ public abstract class AbstractConsoleCommand {
     private final PrintStream systemMessagesStream;
     protected final String[] parts;
 
+    private static final Map<Class<? extends AbstractConsoleCommand>, MusicBand> drafts = new HashMap<>();
+    private MusicBand lastParsedInCurrentRun = null;
+
     public AbstractConsoleCommand(
             ServiceLocator serviceLocator,
             Scanner scanner,
@@ -42,12 +47,45 @@ public abstract class AbstractConsoleCommand {
         throwIfPartsLengthNotEqualTo(partsRequiredSize);
     }
 
-    public abstract void execute() throws Exception;
+    public void executeCommand() throws Exception {
+        Class<? extends AbstractConsoleCommand> commandClass = this.getClass();
+
+        try {
+            execute();
+            drafts.remove(commandClass);
+        } catch (UdpNetworkException e) {
+            if (lastParsedInCurrentRun != null) {
+                drafts.put(commandClass, lastParsedInCurrentRun);
+            }
+
+            throw e;
+        } catch (Exception e) {
+            drafts.remove(commandClass);
+            throw e;
+        } finally {
+            lastParsedInCurrentRun = null;
+        }
+    }
+
+    protected abstract void execute() throws Exception;
 
     protected MusicBand Parse() {
         if (parts == null) {
             throw new IllegalArgumentException("Non-skipped parts should have length 4");
         }
+
+        Class<? extends AbstractConsoleCommand> commandClass = this.getClass();
+
+        if (drafts.containsKey(commandClass)) {
+            systemMessagesStream.println("Прошлый запрос сорвался из-за сети. Использовать сохраненный черновик данных? (y/n)");
+            String answer = NextLine();
+            if (answer.equalsIgnoreCase("y")) {
+                MusicBand cached = drafts.get(commandClass);
+                lastParsedInCurrentRun = cached;
+                return cached;
+            }
+        }
+
         int id = GetId();
         String name = GetName();
         Long numberOfParticipants = GetNumberOfParticipants();
@@ -56,7 +94,11 @@ public abstract class AbstractConsoleCommand {
         MusicGenre musicGenre = GetMusicGenre();
         Label label = GetLabel();
 
-        return new MusicBand(name, coordinates, numberOfParticipants, albumsCount, musicGenre, label, id);
+        MusicBand musicBand = new MusicBand(name, coordinates, numberOfParticipants, albumsCount, musicGenre, label, id);
+
+        lastParsedInCurrentRun = musicBand;
+
+        return musicBand;
     }
 
     private void throwIfPartsLengthNotEqualTo(int length) {

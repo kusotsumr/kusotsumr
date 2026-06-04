@@ -1,21 +1,14 @@
 package musicbandlab.server.api.adapters.udp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import musicbandlab.common.contracts.packets.PacketRequest;
-import musicbandlab.common.contracts.packets.PacketResponse;
-
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.nio.charset.StandardCharsets;
 
 public class RequestReader {
-    private final ObjectMapper mapper;
     private final RequestInvoker requestInvoker;
     private final RequestSender requestSender;
 
-    public RequestReader(ObjectMapper mapper, RequestInvoker requestInvoker, RequestSender requestSender) {
-        this.mapper = mapper;
+    public RequestReader(RequestInvoker requestInvoker, RequestSender requestSender) {
         this.requestInvoker = requestInvoker;
         this.requestSender = requestSender;
     }
@@ -24,33 +17,39 @@ public class RequestReader {
                      ByteBuffer buffer,
                      InetSocketAddress client) {
         try {
+            byte[] data = new byte[buffer.remaining()];
+            buffer.get(data);
 
-            String json = StandardCharsets.UTF_8.decode(buffer).toString();
+            Object request;
+            try (java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(data);
+                 java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais)) {
+                request = ois.readObject();
+            }
 
-            PacketRequest request =
-                    mapper.readValue(json, PacketRequest.class);
-
-            Class<?> requestType =
-                    Class.forName(request.requestType());
-
-            Object requestObj =
-                    mapper.readValue(request.payload(), requestType);
-
-            Object result = requestInvoker.handle(requestType, requestObj);
+            Object result = requestInvoker.handle(request);
             if (result == null) return;
 
-            PacketResponse response =
-                    new PacketResponse(
-                            result.getClass().getName(),
-                            true,
-                            result != null ? mapper.writeValueAsString(result) : null,
-                            null
-                    );
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos)) {
+                oos.writeObject(result);
+            }
 
-            requestSender.send(channel, client, response);
+            requestSender.send(channel, client, baos.toByteArray());
 
         } catch (Exception e) {
-            requestSender.sendError(channel, client, e.getMessage());
+            try {
+                musicbandlab.common.exceptions.RemoteServerException remoteEx =
+                        new musicbandlab.common.exceptions.RemoteServerException(e.getMessage());
+
+                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos)) {
+                    oos.writeObject(remoteEx);
+                }
+
+                requestSender.send(channel, client, baos.toByteArray());
+            } catch (Exception serializationException) {
+                serializationException.printStackTrace();
+            }
         }
     }
 }

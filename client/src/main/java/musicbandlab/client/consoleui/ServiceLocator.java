@@ -21,7 +21,7 @@ public class ServiceLocator {
         mapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         this.musicBandApplication = musicBandApplication;
-        this.serverGateway = new ServerGateway(config, mapper);
+        this.serverGateway = new ServerGateway(config);
         this.executeScriptHelper = new ExecuteScriptHelper();
     }
 
