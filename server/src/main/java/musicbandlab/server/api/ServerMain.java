@@ -42,7 +42,6 @@ public class ServerMain {
                 new GetMusicBandsInfoQueryHandler(repository),
                 new GetMusicBandsLabelsDescendingQueryHandler(repository),
                 new GetMusicBandsWhereLabelLessThanQueryHandler(repository),
-                new GetOverLarpQueryHandler(repository)
         ));
 
         BlockingQueue<ControlCommand> commands = new LinkedBlockingQueue<>();
