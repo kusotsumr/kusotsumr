@@ -36,7 +36,6 @@ public class ServerMain {
                 new ReplaceIfGreaterThanMusicBandCommandHandler(repository),
                 new ReplaceIfLessThanMusicBandCommandHandler(repository),
                 new UpdateMusicBandCommandHandler(repository),
-
                 new GetAllMusicBandsQueryHandler(repository),
                 new GetCountByNumberOfParticipantsQueryHandler(repository),
                 new GetMusicBandsInfoQueryHandler(repository),
