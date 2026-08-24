@@ -41,7 +41,7 @@ public class ServerMain {
                 new GetCountByNumberOfParticipantsQueryHandler(repository),
                 new GetMusicBandsInfoQueryHandler(repository),
                 new GetMusicBandsLabelsDescendingQueryHandler(repository),
-                new GetMusicBandsWhereLabelLessThanQueryHandler(repository),
+                new GetMusicBandsWhereLabelLessThanQueryHandler(repository)
         ));
 
         BlockingQueue<ControlCommand> commands = new LinkedBlockingQueue<>();
