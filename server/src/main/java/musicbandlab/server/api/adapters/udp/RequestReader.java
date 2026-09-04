@@ -1,55 +1,97 @@
 package musicbandlab.server.api.adapters.udp;
 
+import musicbandlab.common.contracts.AuthenticatedRequest;
+import musicbandlab.common.contracts.Request;
+import musicbandlab.common.contracts.UnitResponse;
+import musicbandlab.common.contracts.commands.register.RegisterCommand;
+import musicbandlab.common.exceptions.RemoteServerException;
+import musicbandlab.server.core.application.usecases.CurrentUserContext;
+import musicbandlab.server.core.ports.UserRepository;
+
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
 public class RequestReader {
     private final RequestInvoker requestInvoker;
     private final RequestSender requestSender;
+    private final UserRepository userRepository;
 
-    public RequestReader(RequestInvoker requestInvoker, RequestSender requestSender) {
+    public RequestReader(RequestInvoker requestInvoker, RequestSender requestSender, UserRepository userRepository) {
         this.requestInvoker = requestInvoker;
         this.requestSender = requestSender;
+        this.userRepository = userRepository;
     }
 
-    public void read(DatagramChannel channel,
-                     ByteBuffer buffer,
-                     InetSocketAddress client) {
+    public void read(DatagramChannel channel, byte[] data, InetSocketAddress client) {
+        Object incoming;
         try {
-            byte[] data = new byte[buffer.remaining()];
-            buffer.get(data);
-
-            Object request;
-            try (java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(data);
-                 java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais)) {
-                request = ois.readObject();
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
+                 ObjectInputStream ois = new ObjectInputStream(bais)) {
+                incoming = ois.readObject();
             }
-
-            Object result = requestInvoker.handle(request);
-            if (result == null) return;
-
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos)) {
-                oos.writeObject(result);
-            }
-
-            requestSender.send(channel, client, baos.toByteArray());
-
         } catch (Exception e) {
-            try {
-                musicbandlab.common.exceptions.RemoteServerException remoteEx =
-                        new musicbandlab.common.exceptions.RemoteServerException(e.getMessage());
+            sendError(channel, client, e);
+            return;
+        }
 
-                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos)) {
-                    oos.writeObject(remoteEx);
+        if (!(incoming instanceof AuthenticatedRequest<?> authenticatedRequest)) {
+            sendError(channel, client, new IllegalArgumentException("Запрос должен быть авторизован"));
+            return;
+        }
+
+        //в задании так надо было
+        new Thread(() -> process(channel, client, authenticatedRequest)).start();
+    }
+
+    private void process(DatagramChannel channel, InetSocketAddress client, AuthenticatedRequest<?> authenticatedRequest) {
+        String login = authenticatedRequest.getLogin();
+        String password = authenticatedRequest.getPassword();
+        Request<?> innerRequest = authenticatedRequest.getRequest();
+
+        Object result;
+        try {
+            if (innerRequest instanceof RegisterCommand) {
+                boolean registered = userRepository.register(login, password);
+                if (!registered) {
+                    throw new IllegalArgumentException("Логин уже занят");
+                }
+                result = UnitResponse.INSTANCE;
+            } else {
+                if (!userRepository.verify(login, password)) {
+                    throw new SecurityException("Неверный логин или пароль");
                 }
 
-                requestSender.send(channel, client, baos.toByteArray());
-            } catch (Exception serializationException) {
-                serializationException.printStackTrace();
+                CurrentUserContext.set(login);
+                try {
+                    result = requestInvoker.handle(innerRequest);
+                } finally {
+                    CurrentUserContext.clear();
+                }
             }
+        } catch (Exception e) {
+            result = new RemoteServerException(e.getMessage());
+        }
+
+        if (result == null) return;
+
+        Object finalResult = result;
+        // Отправка ответа — тоже в отдельном java.lang.Thread, по требованию задания
+        new Thread(() -> {
+            try {
+                requestSender.sendResult(channel, client, finalResult);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void sendError(DatagramChannel channel, InetSocketAddress client, Exception e) {
+        try {
+            requestSender.sendResult(channel, client, new RemoteServerException(e.getMessage()));
+        } catch (Exception sendException) {
+            sendException.printStackTrace();
         }
     }
 }

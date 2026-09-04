@@ -2,14 +2,12 @@ package musicbandlab.server.core.application.usecases.commands;
 
 import musicbandlab.common.contracts.commands.replaceifgreaterthanmusicband.ReplaceIfGreaterThanMusicBandCommand;
 import musicbandlab.common.contracts.commands.replaceifgreaterthanmusicband.ReplaceIfGreaterThanMusicBandCommandResponse;
+import musicbandlab.server.core.application.usecases.CurrentUserContext;
 import musicbandlab.server.core.application.usecases.RequestHandler;
 import musicbandlab.server.core.ports.MusicBandRepository;
 
 import java.util.Objects;
 
-/**
- * Реализация обработчика команды замены элемента (если новый больше старого).
- */
 public class ReplaceIfGreaterThanMusicBandCommandHandler
         implements RequestHandler<ReplaceIfGreaterThanMusicBandCommand, ReplaceIfGreaterThanMusicBandCommandResponse> {
     private final MusicBandRepository repository;
@@ -21,8 +19,7 @@ public class ReplaceIfGreaterThanMusicBandCommandHandler
     @Override
     public ReplaceIfGreaterThanMusicBandCommandResponse handle(ReplaceIfGreaterThanMusicBandCommand request) {
         Objects.requireNonNull(request, "request");
-        boolean isSuccess = repository.replaceIfGreaterThan(request.getKey(), request.getMusicBand());
-
+        boolean isSuccess = repository.replaceIfGreaterThan(request.getKey(), request.getMusicBand(), CurrentUserContext.get());
         return new ReplaceIfGreaterThanMusicBandCommandResponse(isSuccess);
     }
 }

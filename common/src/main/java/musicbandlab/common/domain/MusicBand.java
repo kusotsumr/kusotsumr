@@ -22,6 +22,7 @@ public class MusicBand implements Comparable<MusicBand>, java.io.Serializable {
     private long albumsCount; // значение поля должно быть больше 0
     private MusicGenre genre; // поле может быть null
     private Label label; // Поле не может быть null
+    private String ownerLogin;
 
     private MusicBand() {
 
@@ -71,6 +72,8 @@ public class MusicBand implements Comparable<MusicBand>, java.io.Serializable {
         albumsCount = from.albumsCount;
         genre = from.genre;
         label = from.label;
+        // ownerLogin намеренно НЕ копируется: владелец объекта не должен
+        // меняться при update/replace, только при первоначальном insert.
     }
 
     public void setId(int id) {
@@ -93,6 +96,10 @@ public class MusicBand implements Comparable<MusicBand>, java.io.Serializable {
         return creationDate;
     }
 
+    public void setCreationDate(ZonedDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
     public long getNumberOfParticipants () {
         return numberOfParticipants;
     }
@@ -107,6 +114,14 @@ public class MusicBand implements Comparable<MusicBand>, java.io.Serializable {
 
     public Label getLabel() {
         return label;
+    }
+
+    public String getOwnerLogin() {
+        return ownerLogin;
+    }
+
+    public void setOwnerLogin(String ownerLogin) {
+        this.ownerLogin = ownerLogin;
     }
 
     @Override
@@ -145,6 +160,7 @@ public class MusicBand implements Comparable<MusicBand>, java.io.Serializable {
                 "    кол-во альбомов   = " + albumsCount + "\n" +
                 "    жанр              = " + (genre != null ? genre : "отсутствует") + "\n" +
                 "    лейбл             = " + label + "\n" +
+                "    владелец          = " + (ownerLogin != null ? ownerLogin : "отсутствует") + "\n" +
                 "}";
     }
 }

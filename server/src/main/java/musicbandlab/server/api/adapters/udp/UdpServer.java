@@ -2,31 +2,27 @@ package musicbandlab.server.api.adapters.udp;
 
 import musicbandlab.server.api.Config;
 import musicbandlab.server.api.ControlCommand;
-import musicbandlab.server.core.ports.MusicBandRepository;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class UdpServer {
 
     private final Config config;
-    private final MusicBandRepository musicBandRepository;
     private final BlockingQueue<ControlCommand> commands;
     private final RequestReader requestReader;
-    private boolean isRunning = true;
+    private final ExecutorService readPool = Executors.newCachedThreadPool();
+    private volatile boolean isRunning = true;
 
     public UdpServer(BlockingQueue<ControlCommand> commands,
                      Config config,
-                     MusicBandRepository musicBandRepository,
                      RequestReader requestReader) {
         this.commands = commands;
         this.config = config;
-        this.musicBandRepository = musicBandRepository;
         this.requestReader = requestReader;
     }
 
@@ -42,21 +38,11 @@ public class UdpServer {
 
             while (isRunning) {
                 try {
-                    while (true) {
-                        ControlCommand controlCommand = commands.poll();
+                    ControlCommand controlCommand = commands.poll();
 
-                        if (controlCommand == null) {
-                            break;
-                        }
-
-                        switch (controlCommand) {
-                            case SAVE -> save();
-                            case EXIT -> {
-                                save();
-                                isRunning = false;
-                                return;
-                            }
-                        }
+                    if (controlCommand == ControlCommand.EXIT) {
+                        isRunning = false;
+                        break;
                     }
 
                     buffer.clear();
@@ -67,7 +53,10 @@ public class UdpServer {
 
                     buffer.flip();
 
-                    requestReader.read(channel, buffer, client);
+                    byte[] data = new byte[buffer.remaining()];
+                    buffer.get(data);
+
+                    readPool.submit(() -> requestReader.read(channel, data, client));
                 } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
                 }
@@ -75,25 +64,8 @@ public class UdpServer {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private void save() throws IOException {
-        String json = musicBandRepository.serializeToJson();
-
-        FileOutputStream fileOutputStream = null;
-
-        try {
-            fileOutputStream = new FileOutputStream(config.getFileName());
-            byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
-            fileOutputStream.write(bytes);
-            fileOutputStream.flush();
-
-        }
-        finally {
-            if(fileOutputStream != null) {
-                fileOutputStream.close();
-            }
+        } finally {
+            readPool.shutdown();
         }
     }
 }

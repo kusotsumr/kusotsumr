@@ -1,5 +1,6 @@
 package musicbandlab.client.consoleui;
 
+import musicbandlab.common.contracts.AuthenticatedRequest;
 import musicbandlab.common.contracts.Request;
 
 import java.io.IOException;
@@ -15,19 +16,37 @@ public class ServerGateway {
     private final Config config;
     private DatagramChannel channel;
 
+    private String login;
+    private String password;
+
     public ServerGateway(Config config) {
         this.config = config;
     }
 
+    public void setCredentials(String login, String password) {
+        this.login = login;
+        this.password = password;
+    }
+
+    public boolean hasCredentials() {
+        return login != null && password != null;
+    }
+
     public <TRequest extends Request<TResponse>, TResponse extends Serializable>
     TResponse get(TRequest request) throws Exception {
+        if (!hasCredentials()) {
+            throw new IllegalStateException("Сначала нужно войти или зарегистрироваться");
+        }
+
+        AuthenticatedRequest<TResponse> authenticatedRequest =
+                new AuthenticatedRequest<>(login, password, request);
 
         InetSocketAddress server =
                 new InetSocketAddress(config.getHost(), config.getPort());
 
         java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
         try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos)) {
-            oos.writeObject(request);
+            oos.writeObject(authenticatedRequest);
         }
         byte[] requestBytes = baos.toByteArray();
 

@@ -9,22 +9,24 @@ import java.util.ArrayList;
 
 /**
  * Интерфейс репозитория для работы с коллекцией музыкальных групп.
- * Определяет все доступные операции для получения, добавления, обновления, удаления элементов и получения различной информации о коллекции.
+ * Методы-модификаторы (кроме insert) принимают currentUserLogin — логин
+ * пользователя, от чьего имени выполняется операция — чтобы реализация
+ * могла ограничить изменение только объектами этого пользователя.
  */
 public interface MusicBandRepository {
-    public ArrayList<DataEntry<String, MusicBand>> getAll(int page, int pageSize);
-    public MusicBand get(String key);
-    public void insert(String key, MusicBand musicBand);
-    public void updateWhereIdIsEqualTo(int id, MusicBand musicBand);
-    public void remove(String key);
-    public void clear();
-    public void removeWhereLessThan(MusicBand musicBand);
-    public Boolean replaceIfGreaterThan(String key, MusicBand band);
-    public Boolean replaceIfLessThan(String key, MusicBand band);
-    public int getCountWhereNumberOfParticipantsEqualsTo(long numberOfParticipants);
-    public ArrayList<MusicBand> getWhereLabelLessThan(Label label, int page, int pageSize);
-    public ArrayList<Label> getLabelsDescending(int page, int pageSize);
-    public int getSize();
-    public ZonedDateTime getInitializationDate();
-    public String serializeToJson();
+    ArrayList<DataEntry<String, MusicBand>> getAll(int page, int pageSize);
+    MusicBand get(String key);
+    void insert(String key, MusicBand musicBand);
+    void updateWhereIdIsEqualTo(int id, MusicBand musicBand, String currentUserLogin);
+    void remove(String key, String currentUserLogin);
+    void clear(String currentUserLogin);
+    void removeWhereLessThan(MusicBand musicBand, String currentUserLogin);
+    Boolean replaceIfGreaterThan(String key, MusicBand band, String currentUserLogin);
+    Boolean replaceIfLessThan(String key, MusicBand band, String currentUserLogin);
+    int getCountWhereNumberOfParticipantsEqualsTo(long numberOfParticipants);
+    ArrayList<MusicBand> getWhereLabelLessThan(Label label, int page, int pageSize);
+    ArrayList<Label> getLabelsDescending(int page, int pageSize);
+    int getSize();
+    ZonedDateTime getInitializationDate();
+    String serializeToJson();
 }

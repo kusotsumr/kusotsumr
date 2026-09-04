@@ -2,16 +2,15 @@ package musicbandlab.server.core.application.usecases.commands;
 
 import musicbandlab.common.contracts.UnitResponse;
 import musicbandlab.common.contracts.commands.insertmusicband.InsertMusicBandCommand;
+import musicbandlab.common.domain.MusicBand;
+import musicbandlab.server.core.application.usecases.CurrentUserContext;
 import musicbandlab.server.core.application.usecases.RequestHandler;
 import musicbandlab.server.core.ports.MusicBandRepository;
 
 import java.util.Objects;
 
-/**
- * Реализация обработчика команды вставки новой музыкальной группы.
- */
 public class InsertMusicBandCommandHandler implements RequestHandler<InsertMusicBandCommand, UnitResponse> {
-    public MusicBandRepository musicBandRepository;
+    private final MusicBandRepository musicBandRepository;
 
     public InsertMusicBandCommandHandler(MusicBandRepository musicBandRepository) {
         this.musicBandRepository = musicBandRepository;
@@ -20,8 +19,11 @@ public class InsertMusicBandCommandHandler implements RequestHandler<InsertMusic
     @Override
     public UnitResponse handle(InsertMusicBandCommand request) {
         Objects.requireNonNull(request, "request");
-        musicBandRepository.insert(request.getKey(), request.getMusicBand());
 
+        MusicBand musicBand = request.getMusicBand();
+        musicBand.setOwnerLogin(CurrentUserContext.get());
+
+        musicBandRepository.insert(request.getKey(), musicBand);
         return UnitResponse.INSTANCE;
     }
 }
